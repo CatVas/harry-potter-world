@@ -1,0 +1,12 @@
+.heroes {
+  &__btn {
+    width: 100%;
+  }
+
+  &__hd {
+    font-size: 1px;
+    left: -10000px;
+    position: absolute;
+    visibility: hidden;
+  }
+}
