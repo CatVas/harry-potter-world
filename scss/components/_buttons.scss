@@ -1,0 +1,15 @@
+.btn {
+  background-color: $color-brand;
+  border-radius: 2em;
+  font-size: 1.125em;
+  font-weight: 700;
+  padding: 1em 2em;
+
+  &--framed {
+    background-color: transparent;
+    border: 1px solid $color-brand;
+    color: $color-brand;
+    padding-bottom: calc(1em - 1px);
+    padding-top: calc(1em - 1px);
+  }
+}

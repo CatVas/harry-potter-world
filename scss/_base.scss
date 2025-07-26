@@ -1,0 +1,31 @@
+* {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: $color-brand-dark;
+  background-image: url("../img/bg.jpg");
+  background-repeat: no-repeat;
+  background-position: 50% 0;
+  background-size: cover;
+  font-family: "Bluu Next Cyrillic", serif;
+  font-size: 16px;
+}
+
+button {
+  border: none;
+  cursor: pointer;
+  font-family: "Bluu Next Cyrillic", serif;
+  line-height: 130%;
+}
+
+h1 {
+  color: $color-brand-light;
+  font-size: 5em;
+  font-weight: 700;
+  letter-spacing: 1%;
+  line-height: 125%;
+  text-align: center;
+  text-transform: uppercase;
+}
