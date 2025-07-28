@@ -8,21 +8,58 @@
   </head>
   <body>
     <header class="header">
-      <h1 class="header__hd">Welcome to the world of Harry Potter</h1>
-      <button class="btn header__btn" type="button">Show all characters</button>
+      <div class="container">
+        <h1 class="header__hd">Welcome to the world of Harry Potter</h1>
+        <button class="btn header__btn" type="button">
+          Show all characters
+        </button>
+      </div>
     </header>
     <main>
-      <ul>
-        <li>
-          <article class="heroes">
-            <h2 class="heroes__hd">Students of Hogwarts</h2>
-            <img class="heroes__img" src="" alt="" />
-            <button class="btn btn--framed heroes__btn" type="button">
-              Students of Hogwarts
-            </button>
-          </article>
-        </li>
-      </ul>
+      <div class="container">
+        <ul class="tabs tabs--col-3 visible-not">
+          <li class="tabs__item">
+            <article class="heroes">
+              <h2 class="heroes__hd">Hogwarts students</h2>
+              <img
+                class="heroes__img"
+                src="./img/hogwarts-students.jpg"
+                alt=""
+              />
+              <button class="btn btn--framed heroes__btn" type="button">
+                Hogwarts students
+              </button>
+            </article>
+          </li>
+          <li class="tabs__item">
+            <article class="heroes">
+              <h2 class="heroes__hd">Hogwarts workers</h2>
+              <img
+                class="heroes__img"
+                src="./img/hogwarts-workers.jpg"
+                alt=""
+              />
+              <button class="btn btn--framed heroes__btn" type="button">
+                Hogwarts workers
+              </button>
+            </article>
+          </li>
+          <li class="tabs__item">
+            <article class="heroes">
+              <h2 class="heroes__hd">Certain house characters</h2>
+              <img
+                class="heroes__img"
+                src="./img/certain-house-characters.jpg"
+                alt=""
+              />
+              <button class="btn btn--framed heroes__btn" type="button">
+                Certain house characters
+              </button>
+            </article>
+          </li>
+        </ul>
+      </div>
     </main>
+    <footer class="footer"></footer>
   </body>
 </html>
