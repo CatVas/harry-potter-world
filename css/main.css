@@ -70,7 +70,7 @@ li {
   }
 }
 
-.visible-not {
+.invisible {
   display: none !important;
 }
 

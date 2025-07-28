@@ -10,14 +10,14 @@
     <header class="header">
       <div class="container">
         <h1 class="header__hd">Welcome to the world of Harry Potter</h1>
-        <button class="btn header__btn" type="button">
+        <button class="btn header__btn" id="show-characters" type="button">
           Show all characters
         </button>
       </div>
     </header>
     <main>
       <div class="container">
-        <ul class="tabs tabs--col-3 visible-not">
+        <ul class="tabs tabs--col-3 invisible" id="chars-list">
           <li class="tabs__item">
             <article class="heroes">
               <h2 class="heroes__hd">Hogwarts students</h2>
@@ -26,9 +26,11 @@
                 src="./img/hogwarts-students.jpg"
                 alt=""
               />
-              <button class="btn btn--framed heroes__btn" type="button">
-                Hogwarts students
-              </button>
+              <a href="#">
+                <button class="btn btn--framed heroes__btn" type="button">
+                  Hogwarts students
+                </button>
+              </a>
             </article>
           </li>
           <li class="tabs__item">
@@ -39,9 +41,11 @@
                 src="./img/hogwarts-workers.jpg"
                 alt=""
               />
-              <button class="btn btn--framed heroes__btn" type="button">
-                Hogwarts workers
-              </button>
+              <a href="#">
+                <button class="btn btn--framed heroes__btn" type="button">
+                  Hogwarts workers
+                </button>
+              </a>
             </article>
           </li>
           <li class="tabs__item">
@@ -52,14 +56,17 @@
                 src="./img/certain-house-characters.jpg"
                 alt=""
               />
-              <button class="btn btn--framed heroes__btn" type="button">
-                Certain house characters
-              </button>
+              <a href="#">
+                <button class="btn btn--framed heroes__btn" type="button">
+                  Certain house characters
+                </button>
+              </a>
             </article>
           </li>
         </ul>
       </div>
     </main>
     <footer class="footer"></footer>
+    <script src="./js/script.js"></script>
   </body>
 </html>
