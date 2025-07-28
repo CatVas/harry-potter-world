@@ -1,0 +1,23 @@
+.header {
+  padding: 70px 0 90px;
+
+  @media screen and (min-width: $bp-tablet) {
+    padding-bottom: 150px;
+    padding-top: 85px;
+  }
+
+  @media screen and (min-width: $bp-laptop) {
+    padding-bottom: 250px;
+    padding-top: 100px;
+  }
+
+  &__btn {
+    display: block;
+    margin: 0 auto;
+  }
+
+  &__hd {
+    margin: 0 auto 1em;
+    max-width: 1040px;
+  }
+}

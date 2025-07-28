@@ -1,0 +1,19 @@
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25em;
+
+  &--col-3 {
+    .tabs__item {
+      width: 100%;
+
+      @media screen and (min-width: $bp-mobile) {
+        width: calc((100% - 1.25em) / 2);
+      }
+
+      @media screen and (min-width: $bp-tablet) {
+        width: calc((100% - 1.25em * 2) / 3);
+      }
+    }
+  }
+}

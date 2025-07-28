@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./css/main-min.css" />
+    <title>Welcome to Harry Potter's world!</title>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <h1 class="header__hd">Welcome to the world of Harry Potter</h1>
+        <button class="btn header__btn" id="show-characters" type="button">
+          Show all characters
+        </button>
+      </div>
+    </header>
+    <main>
+      <div class="container">
+        <ul class="tabs tabs--col-3 invisible" id="chars-list">
+          <li class="tabs__item">
+            <article class="heroes">
+              <h2 class="heroes__hd">Hogwarts students</h2>
+              <img
+                class="heroes__img"
+                src="./img/hogwarts-students.jpg"
+                alt=""
+              />
+              <a href="#">
+                <button class="btn btn--framed heroes__btn" type="button">
+                  Hogwarts students
+                </button>
+              </a>
+            </article>
+          </li>
+          <li class="tabs__item">
+            <article class="heroes">
+              <h2 class="heroes__hd">Hogwarts workers</h2>
+              <img
+                class="heroes__img"
+                src="./img/hogwarts-workers.jpg"
+                alt=""
+              />
+              <a href="#">
+                <button class="btn btn--framed heroes__btn" type="button">
+                  Hogwarts workers
+                </button>
+              </a>
+            </article>
+          </li>
+          <li class="tabs__item">
+            <article class="heroes">
+              <h2 class="heroes__hd">Certain house characters</h2>
+              <img
+                class="heroes__img"
+                src="./img/certain-house-characters.jpg"
+                alt=""
+              />
+              <a href="#">
+                <button class="btn btn--framed heroes__btn" type="button">
+                  Certain house characters
+                </button>
+              </a>
+            </article>
+          </li>
+        </ul>
+      </div>
+    </main>
+    <footer class="footer"></footer>
+    <script src="./js/script.js"></script>
+  </body>
+</html>
