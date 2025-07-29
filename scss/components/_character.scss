@@ -1,0 +1,85 @@
+.character {
+  font-family: "Inter", sans-serif;
+  height: 450px;
+  position: relative;
+
+  &__data {
+    bottom: 0;
+    left: 0;
+    padding: 1.25em;
+    padding-top: 0;
+    position: absolute;
+    right: 0;
+  }
+
+  &__img {
+    border-radius: 1.25em;
+    bottom: 0;
+    left: 0;
+    overflow: hidden;
+    position: absolute;
+    right: 0;
+    top: 0;
+
+    &::after {
+      background: linear-gradient(
+        179.32deg,
+        #0f0f0f -0.99%,
+        rgba(15, 15, 15, 0.74) 51.85%,
+        rgba(15, 15, 15, 0) 86.04%
+      );
+      bottom: 0;
+      content: "";
+      height: 60%;
+      left: 0;
+      position: absolute;
+      right: 0;
+      transform: rotate(-180deg);
+    }
+
+    &-pic {
+      display: block;
+      height: 100%;
+      object-fit: cover;
+      width: 100%;
+    }
+  }
+
+  &__info {
+    color: $color-brand-light;
+    margin: 0 0 0.9375em;
+
+    p {
+      margin: 0 0 0.1875em;
+    }
+  }
+
+  &__link {
+    color: $color-light;
+    font-weight: 500;
+
+    &-a {
+      align-items: center;
+      color: inherit;
+      display: inline-flex;
+      position: relative;
+      text-decoration: none;
+
+      &::after {
+        background: url("../img/arrow-right-ball.svg") no-repeat;
+        content: "";
+        display: inline-block;
+        height: 20px;
+        margin: 0 0 0 0.625em;
+        width: 30px;
+      }
+    }
+  }
+
+  &__name {
+    color: $color-light;
+    font-size: 1.625em;
+    font-weight: 500;
+    margin: 0 0 0.192em;
+  }
+}
