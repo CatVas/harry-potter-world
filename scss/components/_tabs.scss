@@ -3,16 +3,34 @@
   flex-wrap: wrap;
   gap: 1.25em;
 
+  &__item {
+    width: 100%;
+  }
+
   &--col-3 {
     .tabs__item {
-      width: 100%;
-
       @media screen and (min-width: $bp-mobile) {
         width: calc((100% - 1.25em) / 2);
       }
 
       @media screen and (min-width: $bp-tablet) {
         width: calc((100% - 1.25em * 2) / 3);
+      }
+    }
+  }
+
+  &--col-4 {
+    .tabs__item {
+      @media screen and (min-width: $bp-mobile) {
+        width: calc((100% - 1.25em) / 2);
+      }
+
+      @media screen and (min-width: $bp-tablet) {
+        width: calc((100% - 1.25em * 2) / 3);
+      }
+
+      @media screen and (min-width: $bp-laptop) {
+        width: calc((100% - 1.25em * 3) / 4);
       }
     }
   }
