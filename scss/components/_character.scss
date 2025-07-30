@@ -1,6 +1,8 @@
 .character {
+  border-radius: 1.25em;
   font-family: "Inter", sans-serif;
   height: 450px;
+  overflow: hidden;
   position: relative;
 
   &__data {
@@ -12,8 +14,26 @@
     right: 0;
   }
 
+  &__details {
+    background-color: $color-brand-dark;
+    bottom: 0;
+    display: none;
+    left: 0;
+    opacity: 0.95;
+    overflow-y: scroll;
+    padding: 1.25em;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  &:hover {
+    .character__details {
+      display: block;
+    }
+  }
+
   &__img {
-    border-radius: 1.25em;
     bottom: 0;
     left: 0;
     overflow: hidden;

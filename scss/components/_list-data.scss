@@ -1,0 +1,17 @@
+.list-data {
+  color: $color-brand-light;
+
+  & li {
+    font-size: 0.875em;
+    line-height: 1.4;
+    margin: 0 0 0.143em;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  &__def {
+    color: $color-light;
+  }
+}
