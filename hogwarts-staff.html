@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./css/main-min.css" />
+    <title>Hogwarts staff</title>
+  </head>
+  <body>
+    <header class="header">
+      <div class="container">
+        <h1 class="header__hd">Hogwarts staff</h1>
+      </div>
+    </header>
+    <main>
+      <div class="container">
+        <span class="loading hogwarts-characters-loading"></span>
+        <ul class="tabs tabs--col-4"></ul>
+        <p class="hogwarts-characters-status invisible status-message">
+          Oops, it seems Hogwarts has no staff right now.
+          <br />
+          Maybe you could join? - Or just reload this page!
+          <br />
+          ;-)
+        </p>
+        <p
+          class="hogwarts-characters-error invisible status-message status-message--error"
+        ></p>
+      </div>
+    </main>
+    <footer class="footer"></footer>
+    <script src="./js/script.js"></script>
+  </body>
+</html>
