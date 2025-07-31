@@ -1,3 +1,4 @@
+// === Constants ===
 const API = {
   BASE: "https://hp-api.onrender.com/api",
   PATHS: {
@@ -11,16 +12,22 @@ const API = {
 };
 const CLASS_INVISIBLE = "invisible";
 const PAGE_NAME = {
-  STAFF: "",
+  STAFF: "hogwarts-staff.html",
   STUDENTS: "hogwarts-students.html",
 };
 const PAGINATION = {
   PER_PAGE: 8,
 };
 
-const showCharactersBtn = document.getElementById("show-characters");
+// === DOM elements ===
 const charsList = document.getElementById("chars-list");
+const loadingEl = document.querySelector(".hogwarts-characters-loading");
+const showCharactersBtn = document.getElementById("show-characters");
+const statusEl = document.querySelector(".hogwarts-characters-status");
+const statusErrorEl = document.querySelector(".hogwarts-characters-error");
+const tabsListEl = document.querySelector(".tabs");
 
+// === Controller ===
 showCharactersBtn &&
   showCharactersBtn.addEventListener("click", () => {
     const isVisible = !hasClass(charsList, CLASS_INVISIBLE);
@@ -36,167 +43,263 @@ showCharactersBtn &&
     } all characters`;
   });
 
-const pageName = checkPage();
+ctrlRenderCharacterPages();
 
-if (pageName.students) {
-  fetchStudentsData().then(({ error = "", students = [] }) => {
-    const loadingEl = document.querySelector(".hogwarts-characters-loading");
-    const statusEl = document.querySelector(".hogwarts-characters-status");
-    const statusErrorEl = document.querySelector(".hogwarts-characters-error");
-    const tabsListEl = document.querySelector(".tabs");
-
-    loadingEl.remove();
-
-    if (students.length < 1 && !error) {
-      statusEl.classList.remove("invisible");
-    }
-    if (error) {
-      statusErrorEl.textContent = error;
-      statusErrorEl.classList.remove("invisible");
-    }
-    if (error || students.length < 1) {
-      tabsListEl.remove();
-
-      return;
-    }
-
-    const itemsHTML = students
-      .map(
-        ({
-          actor = "",
-          alive = false,
-          alternate_names = [],
-          ancestry = "",
-          dateOfBirth = "",
-          eyeColour = "",
-          gender = "",
-          hairColour = "",
-          hogwartsStaff = false,
-          hogwartsStudent = false,
-          house = "",
-          image = "",
-          name = "",
-          patronus = "",
-          species = "",
-          wand = {},
-          wizard = false,
-          yearOfBirth = 0,
-        } = {}) => {
-          const alternateName = alternate_names[0] || "";
-          const detailsHTML = [
-            { label: "Name", value: name },
-            { label: "Alternate names", value: alternate_names.join(", ") },
-            { label: "Species", value: capitalizeFirstLetter(species) },
-            { label: "Gender", value: capitalizeFirstLetter(gender) },
-            { label: "House", value: house },
-            { label: "Date of birth", value: dateOfBirth },
-            { label: "Year of birth", value: yearOfBirth },
-            { label: "Wizard", value: capitalizeFirstLetter(`${wizard}`) },
-            { label: "Ancestry", value: capitalizeFirstLetter(ancestry) },
-            { label: "Eye colour", value: capitalizeFirstLetter(eyeColour) },
-            { label: "Hair colour", value: capitalizeFirstLetter(hairColour) },
-            { label: "Wand", value: wandStringify(wand) },
-            { label: "Patronus", value: capitalizeFirstLetter(patronus) },
-            {
-              label: "Hogwarts student",
-              value: capitalizeFirstLetter(`${hogwartsStudent}`),
-            },
-            {
-              label: "Hogwarts staff",
-              value: capitalizeFirstLetter(`${hogwartsStaff}`),
-            },
-            { label: "Actor", value: actor },
-            { label: "Alive", value: capitalizeFirstLetter(`${alive}`) },
-          ]
-            .filter(({ value }) => Boolean(value))
-            .map(
-              ({ label, value }) => `
-            <li>
-              <span class="list-data__def">${label}:</span> ${value}
-            </li>`
-            )
-            .join("");
-
-          return `<li class="tabs__item">
-            <article class="character">
-              <div class="character__img">
-                <img
-                  class="character__img-pic"
-                  src="${image || "./img/wizard-silhouette.jpeg"}"
-                  alt=""
-                />
-              </div>
-              <div class="character__data">
-                <p class="character__name">${name}</p>
-                <div class="character__info">
-                  <p>${alternateName}</p>
-                  <p>${house}</p>
-                  <p>${dateOfBirth}</p>
-                </div>
-                <p class="character__link">
-                  <a class="character__link-a" href="#">More info</a>
-                </p>
-              </div>
-              <div class="character__details">
-                <ul class="list-data">
-                  ${detailsHTML}
-                </ul>
-              </div>
-            </article>
-          </li>`;
-        }
-      )
-      .join("");
-
-    tabsListEl.innerHTML = itemsHTML;
-  });
-}
-
+// === API ===
 function apiUrl({ characterId = "" } = {}) {
   const {
     BASE,
-    PATHS: { CHARACTER, CHARACTERS, STUDENTS },
+    PATHS: { CHARACTER, CHARACTERS, STAFF, STUDENTS },
   } = API;
   const characters = `${BASE}${CHARACTERS}`;
 
   return {
     character: `${BASE}${CHARACTER}/${characterId}`,
     characters,
+    staff: `${characters}${STAFF}`,
     students: `${characters}${STUDENTS}`,
   };
 }
 
-function capitalizeFirstLetter(str = "") {
-  return str.length > 0 ? str.charAt(0).toUpperCase() + str.slice(1) : "";
-}
-
-function checkPage() {
-  const { STUDENTS } = PAGE_NAME;
-
-  return { students: location.pathname.indexOf(STUDENTS) > -1 };
-}
-
-async function fetchStudentsData() {
-  const url = apiUrl().students;
-
+async function fetchRun({ errorMessage = "", url = "", onResult = null } = {}) {
   try {
     const response = await fetch(url);
 
     if (response.status !== 200) {
-      throw new Error("Bad fetching students");
+      throw new Error(errorMessage || "Bad API request");
     }
 
     const result = await response.json();
-    const students = result.slice(0, PAGINATION.PER_PAGE);
 
-    return { students };
+    return {
+      result: typeof onResult === "function" ? onResult(result) : result,
+    };
   } catch (e) {
     return { error: e.message };
   }
 }
 
+function fetchStaffData() {
+  return fetchRun({
+    errorMessage: "Bad loading staff %-(",
+    url: apiUrl().staff,
+    onResult: (s) => s.slice(0, PAGINATION.PER_PAGE),
+  });
+}
+
+function fetchStudentsData() {
+  return fetchRun({
+    errorMessage: "Bad loading students :-(",
+    url: apiUrl().students,
+    onResult: (s) => s.slice(0, PAGINATION.PER_PAGE),
+  });
+}
+
+// === Control ===
+function ctrlRenderCharacterPages() {
+  const pageName = checkPage();
+  let promiseData;
+
+  if (pageName.staff) {
+    promiseData = fetchStaffData();
+  }
+  if (pageName.students) {
+    promiseData = fetchStudentsData();
+  }
+
+  promiseData && promiseData.then(uiOnCharactersDataFetched);
+}
+
+// === Render UI ===
+function renderCharacterCard({
+  alternateName = "",
+  dateOfBirth = "",
+  detailsHTML = "",
+  house = "",
+  image = "",
+  name = "",
+} = {}) {
+  const infoUI = renderListItems({
+    filterItems: (s) => Boolean(s),
+    itemsData: [alternateName, house, dateOfBirth],
+    mapToUi: (data) => `<p>${data}</p>`,
+  });
+
+  return `
+    <article class="character">
+      <div class="character__img">
+        <img
+          class="character__img-pic"
+          src="${image || "./img/wizard-silhouette.jpeg"}"
+          alt=""
+        />
+      </div>
+      <div class="character__data">
+        <p class="character__name">${name}</p>
+        <div class="character__info">
+          ${infoUI}
+        </div>
+        <p class="character__link">
+          <a class="character__link-a" href="#">More info</a>
+        </p>
+      </div>
+      <div class="character__details">
+        <ul class="list-data">
+          ${detailsHTML}
+        </ul>
+      </div>
+    </article>`;
+}
+
+function renderCharacterDetailsItem({ label, value }) {
+  return `
+    <li>
+      <span class="list-data__def">${label}:</span> ${value}
+    </li>`;
+}
+
+function renderCharacterTabsItem({
+  alternateName = "",
+  dateOfBirth = "",
+  detailsHTML = "",
+  house = "",
+  image = "",
+  name = "",
+} = {}) {
+  return `
+    <li class="tabs__item">
+      ${renderCharacterCard({
+        alternateName,
+        dateOfBirth,
+        detailsHTML,
+        house,
+        image,
+        name,
+      })}
+    </li>`;
+}
+
+function renderListItems({
+  filterItems = () => true,
+  itemsData = [],
+  mapToUi = () => {},
+} = {}) {
+  return itemsData.filter(filterItems).map(mapToUi).join("");
+}
+
+function renderTabsList({ items = [] } = {}) {
+  const itemsHTML = renderListItems({
+    itemsData: items,
+    mapToUi: ({
+      actor = "",
+      alive = false,
+      alternate_names = [],
+      ancestry = "",
+      dateOfBirth = "",
+      eyeColour = "",
+      gender = "",
+      hairColour = "",
+      hogwartsStaff = false,
+      hogwartsStudent = false,
+      house = "",
+      image = "",
+      name = "",
+      patronus = "",
+      species = "",
+      wand = {},
+      wizard = false,
+      yearOfBirth = 0,
+    } = {}) => {
+      const alternateName = alternate_names[0] || "";
+      const detailsHTML = renderListItems({
+        filterItems: ({ value }) => Boolean(value),
+        itemsData: [
+          { label: "Name", value: name },
+          { label: "Alternate names", value: alternate_names.join(", ") },
+          { label: "Species", value: capitalizeFirstLetter(species) },
+          { label: "Gender", value: capitalizeFirstLetter(gender) },
+          { label: "House", value: house },
+          { label: "Date of birth", value: dateOfBirth },
+          { label: "Year of birth", value: yearOfBirth },
+          { label: "Wizard", value: capitalizeFirstLetter(`${wizard}`) },
+          { label: "Ancestry", value: capitalizeFirstLetter(ancestry) },
+          { label: "Eye colour", value: capitalizeFirstLetter(eyeColour) },
+          { label: "Hair colour", value: capitalizeFirstLetter(hairColour) },
+          { label: "Wand", value: wandStringify(wand) },
+          { label: "Patronus", value: capitalizeFirstLetter(patronus) },
+          {
+            label: "Hogwarts student",
+            value: capitalizeFirstLetter(`${hogwartsStudent}`),
+          },
+          {
+            label: "Hogwarts staff",
+            value: capitalizeFirstLetter(`${hogwartsStaff}`),
+          },
+          { label: "Actor", value: actor },
+          { label: "Alive", value: capitalizeFirstLetter(`${alive}`) },
+        ],
+        mapToUi: renderCharacterDetailsItem,
+      });
+
+      return renderCharacterTabsItem({
+        alternateName,
+        dateOfBirth,
+        detailsHTML,
+        house,
+        image,
+        name,
+      });
+    },
+  });
+
+  tabsListEl && (tabsListEl.innerHTML = itemsHTML);
+}
+
+// === UI logic ===
+function uiOnCharactersDataFetched({ error = "", result = [] }) {
+  uiStatusesOnCharactersFetch({ error, result });
+
+  if (error || result.length < 1) {
+    tabsListEl && tabsListEl.remove();
+
+    return;
+  }
+
+  renderTabsList({ items: result });
+}
+
+function uiStatusesOnCharactersFetch({ error = "", result = [] }) {
+  loadingEl && loadingEl.remove();
+
+  if (result.length < 1 && !error) {
+    statusEl && statusEl.classList.remove("invisible");
+  }
+  if (error && statusErrorEl) {
+    statusErrorEl.textContent = error;
+    statusErrorEl.classList.remove("invisible");
+  }
+}
+
+// === Utils ===
+function capitalizeFirstLetter(str = "") {
+  return str.length > 0 ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+}
+
+function checkPage() {
+  const { STAFF = "", STUDENTS = "" } = PAGE_NAME;
+
+  return {
+    staff: ifPagePathContains(STAFF),
+    students: ifPagePathContains(STUDENTS),
+  };
+}
+
 function hasClass(el = null, className = "") {
   return el.classList.contains(className);
+}
+
+function ifPagePathContains(pathPart = "") {
+  return location.pathname.indexOf(pathPart) > -1;
 }
 
 function wandStringify({ core = "", length = 0, wood = "" } = {}) {

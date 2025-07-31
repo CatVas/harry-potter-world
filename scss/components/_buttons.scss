@@ -1,9 +1,12 @@
 .btn {
   background-color: $color-brand;
   border-radius: 2em;
+  display: inline-block;
   font-size: 0.85em;
   font-weight: 700;
   padding: 1em 2em;
+  text-align: center;
+  text-decoration: none;
 
   @media screen and (min-width: $bp-tablet) {
     font-size: 1em;
