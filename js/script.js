@@ -11,7 +11,14 @@ const API = {
   },
 };
 const CLASS_INVISIBLE = "invisible";
+const HOUSES = {
+  GRYFFINDOR: "GRYFFINDOR",
+  HUFFLEPUFF: "HUFFLEPUFF",
+  RAVENCLAW: "RAVENCLAW",
+  SLYTHERIN: "SLYTHERIN",
+};
 const PAGE_NAME = {
+  CERTAIN_HOUSE_CHARACTERS: "certain-house-characters.html",
   STAFF: "hogwarts-staff.html",
   STUDENTS: "hogwarts-students.html",
 };
@@ -46,16 +53,17 @@ showCharactersBtn &&
 ctrlRenderCharacterPages();
 
 // === API ===
-function apiUrl({ characterId = "" } = {}) {
+function apiUrl({ characterId = "", house = "" } = {}) {
   const {
     BASE,
-    PATHS: { CHARACTER, CHARACTERS, STAFF, STUDENTS },
+    PATHS: { CHARACTER, CHARACTERS, HOUSE, STAFF, STUDENTS },
   } = API;
   const characters = `${BASE}${CHARACTERS}`;
 
   return {
     character: `${BASE}${CHARACTER}/${characterId}`,
     characters,
+    houseCharacters: `${characters}${HOUSE}/${house.toLowerCase()}`,
     staff: `${characters}${STAFF}`,
     students: `${characters}${STUDENTS}`,
   };
@@ -79,6 +87,14 @@ async function fetchRun({ errorMessage = "", url = "", onResult = null } = {}) {
   }
 }
 
+function fetchHouseCharactersData(house = "") {
+  return fetchRun({
+    errorMessage: `Bad loading ${capitalizeFirstLetter(house)} characters %-(`,
+    url: apiUrl({ house }).houseCharacters,
+    onResult: (s) => s.slice(0, PAGINATION.PER_PAGE),
+  });
+}
+
 function fetchStaffData() {
   return fetchRun({
     errorMessage: "Bad loading staff %-(",
@@ -97,13 +113,16 @@ function fetchStudentsData() {
 
 // === Control ===
 function ctrlRenderCharacterPages() {
-  const pageName = checkPage();
+  const { certainHouseCharacters, staff, students } = checkPage();
   let promiseData;
 
-  if (pageName.staff) {
+  if (certainHouseCharacters) {
+    promiseData = fetchHouseCharactersData(HOUSES.GRYFFINDOR);
+  }
+  if (staff) {
     promiseData = fetchStaffData();
   }
-  if (pageName.students) {
+  if (students) {
     promiseData = fetchStudentsData();
   }
 
@@ -282,13 +301,20 @@ function uiStatusesOnCharactersFetch({ error = "", result = [] }) {
 
 // === Utils ===
 function capitalizeFirstLetter(str = "") {
-  return str.length > 0 ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+  return str.length > 0
+    ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+    : "";
 }
 
 function checkPage() {
-  const { STAFF = "", STUDENTS = "" } = PAGE_NAME;
+  const {
+    CERTAIN_HOUSE_CHARACTERS = "",
+    STAFF = "",
+    STUDENTS = "",
+  } = PAGE_NAME;
 
   return {
+    certainHouseCharacters: ifPagePathContains(CERTAIN_HOUSE_CHARACTERS),
     staff: ifPagePathContains(STAFF),
     students: ifPagePathContains(STUDENTS),
   };
