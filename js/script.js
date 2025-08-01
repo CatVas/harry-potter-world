@@ -28,6 +28,7 @@ const PAGINATION = {
 
 // === DOM elements ===
 const charsList = document.getElementById("chars-list");
+const houseSwitchEl = document.querySelector(".house-switch");
 const loadingEl = document.querySelector(".hogwarts-characters-loading");
 const showCharactersBtn = document.getElementById("show-characters");
 const statusEl = document.querySelector(".hogwarts-characters-status");
@@ -117,7 +118,17 @@ function ctrlRenderCharacterPages() {
   let promiseData;
 
   if (certainHouseCharacters) {
-    promiseData = fetchHouseCharactersData(HOUSES.GRYFFINDOR);
+    const statusHouseNameEl = document.querySelector(
+      ".hogwarts-characters-status__house-name"
+    );
+    const { house } = searchParamsGet();
+    const houseActive = house || HOUSES.GRYFFINDOR;
+
+    promiseData = fetchHouseCharactersData(houseActive);
+    renderHouseSwitchItems(houseActive);
+
+    statusHouseNameEl &&
+      (statusHouseNameEl.innerHTML = capitalizeFirstLetter(house));
   }
   if (staff) {
     promiseData = fetchStaffData();
@@ -196,6 +207,35 @@ function renderCharacterTabsItem({
         name,
       })}
     </li>`;
+}
+
+function renderHouseSwitchItems(house) {
+  const onItemClick = (house) => {
+    searchParamsSet({ house: house.toLowerCase() });
+  };
+
+  const items = renderListItems({
+    itemsData: Object.keys(HOUSES).map((key) => HOUSES[key]),
+    mapToUi: (houseCurrent) =>
+      `<li
+        class="house-switch__item ${
+          houseCurrent.toLowerCase() === house.toLowerCase()
+            ? "house-switch__item--active"
+            : ""
+        }"
+        data-house="${houseCurrent}"
+      >
+        <img alt="" class="house-switch__item-logo" src="./img/logo-${houseCurrent.toLowerCase()}.svg">
+        ${houseCurrent}
+      </li>`,
+  });
+
+  houseSwitchEl && (houseSwitchEl.innerHTML = items);
+  houseSwitchEl.childNodes.forEach((li) => {
+    li.addEventListener("click", () => {
+      onItemClick(li.dataset.house);
+    });
+  });
 }
 
 function renderListItems({
@@ -326,6 +366,44 @@ function hasClass(el = null, className = "") {
 
 function ifPagePathContains(pathPart = "") {
   return location.pathname.indexOf(pathPart) > -1;
+}
+
+function searchParamsFromObj(params = {}) {
+  return (
+    "?" +
+    Object.keys(params)
+      .map((key) => `${key}=${params[key]}`)
+      .join("&")
+  );
+}
+
+function searchParamsGet() {
+  const { search } = location;
+
+  if (!search || search[0] !== "?") {
+    return {};
+  }
+
+  return search
+    .slice(1)
+    .split("&")
+    .reduce((acc, curr) => {
+      const [label, value] = curr.split("=");
+
+      acc[label] = value;
+
+      return acc;
+    }, {});
+}
+
+function searchParamsSet(params = {}) {
+  const current = searchParamsGet();
+
+  Object.keys(params).forEach((key) => {
+    current[key] = params[key];
+  });
+
+  location.search = searchParamsFromObj(current);
 }
 
 function wandStringify({ core = "", length = 0, wood = "" } = {}) {
