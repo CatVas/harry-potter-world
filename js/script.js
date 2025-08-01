@@ -11,7 +11,14 @@ const API = {
   },
 };
 const CLASS_INVISIBLE = "invisible";
+const HOUSES = {
+  GRYFFINDOR: "GRYFFINDOR",
+  HUFFLEPUFF: "HUFFLEPUFF",
+  RAVENCLAW: "RAVENCLAW",
+  SLYTHERIN: "SLYTHERIN",
+};
 const PAGE_NAME = {
+  CERTAIN_HOUSE_CHARACTERS: "certain-house-characters.html",
   STAFF: "hogwarts-staff.html",
   STUDENTS: "hogwarts-students.html",
 };
@@ -21,6 +28,7 @@ const PAGINATION = {
 
 // === DOM elements ===
 const charsList = document.getElementById("chars-list");
+const houseSwitchEl = document.querySelector(".house-switch");
 const loadingEl = document.querySelector(".hogwarts-characters-loading");
 const showCharactersBtn = document.getElementById("show-characters");
 const statusEl = document.querySelector(".hogwarts-characters-status");
@@ -46,16 +54,17 @@ showCharactersBtn &&
 ctrlRenderCharacterPages();
 
 // === API ===
-function apiUrl({ characterId = "" } = {}) {
+function apiUrl({ characterId = "", house = "" } = {}) {
   const {
     BASE,
-    PATHS: { CHARACTER, CHARACTERS, STAFF, STUDENTS },
+    PATHS: { CHARACTER, CHARACTERS, HOUSE, STAFF, STUDENTS },
   } = API;
   const characters = `${BASE}${CHARACTERS}`;
 
   return {
     character: `${BASE}${CHARACTER}/${characterId}`,
     characters,
+    houseCharacters: `${characters}${HOUSE}/${house.toLowerCase()}`,
     staff: `${characters}${STAFF}`,
     students: `${characters}${STUDENTS}`,
   };
@@ -79,6 +88,14 @@ async function fetchRun({ errorMessage = "", url = "", onResult = null } = {}) {
   }
 }
 
+function fetchHouseCharactersData(house = "") {
+  return fetchRun({
+    errorMessage: `Bad loading ${capitalizeFirstLetter(house)} characters %-(`,
+    url: apiUrl({ house }).houseCharacters,
+    onResult: (s) => s.slice(0, PAGINATION.PER_PAGE),
+  });
+}
+
 function fetchStaffData() {
   return fetchRun({
     errorMessage: "Bad loading staff %-(",
@@ -97,13 +114,26 @@ function fetchStudentsData() {
 
 // === Control ===
 function ctrlRenderCharacterPages() {
-  const pageName = checkPage();
+  const { certainHouseCharacters, staff, students } = checkPage();
   let promiseData;
 
-  if (pageName.staff) {
+  if (certainHouseCharacters) {
+    const statusHouseNameEl = document.querySelector(
+      ".hogwarts-characters-status__house-name"
+    );
+    const { house } = searchParamsGet();
+    const houseActive = house || HOUSES.GRYFFINDOR;
+
+    promiseData = fetchHouseCharactersData(houseActive);
+    renderHouseSwitchItems(houseActive);
+
+    statusHouseNameEl &&
+      (statusHouseNameEl.innerHTML = capitalizeFirstLetter(house));
+  }
+  if (staff) {
     promiseData = fetchStaffData();
   }
-  if (pageName.students) {
+  if (students) {
     promiseData = fetchStudentsData();
   }
 
@@ -177,6 +207,35 @@ function renderCharacterTabsItem({
         name,
       })}
     </li>`;
+}
+
+function renderHouseSwitchItems(house) {
+  const onItemClick = (house) => {
+    searchParamsSet({ house: house.toLowerCase() });
+  };
+
+  const items = renderListItems({
+    itemsData: Object.keys(HOUSES).map((key) => HOUSES[key]),
+    mapToUi: (houseCurrent) =>
+      `<li
+        class="house-switch__item ${
+          houseCurrent.toLowerCase() === house.toLowerCase()
+            ? "house-switch__item--active"
+            : ""
+        }"
+        data-house="${houseCurrent}"
+      >
+        <img alt="" class="house-switch__item-logo" src="./img/logo-${houseCurrent.toLowerCase()}.svg">
+        ${houseCurrent}
+      </li>`,
+  });
+
+  houseSwitchEl && (houseSwitchEl.innerHTML = items);
+  houseSwitchEl.childNodes.forEach((li) => {
+    li.addEventListener("click", () => {
+      onItemClick(li.dataset.house);
+    });
+  });
 }
 
 function renderListItems({
@@ -282,13 +341,20 @@ function uiStatusesOnCharactersFetch({ error = "", result = [] }) {
 
 // === Utils ===
 function capitalizeFirstLetter(str = "") {
-  return str.length > 0 ? str.charAt(0).toUpperCase() + str.slice(1) : "";
+  return str.length > 0
+    ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+    : "";
 }
 
 function checkPage() {
-  const { STAFF = "", STUDENTS = "" } = PAGE_NAME;
+  const {
+    CERTAIN_HOUSE_CHARACTERS = "",
+    STAFF = "",
+    STUDENTS = "",
+  } = PAGE_NAME;
 
   return {
+    certainHouseCharacters: ifPagePathContains(CERTAIN_HOUSE_CHARACTERS),
     staff: ifPagePathContains(STAFF),
     students: ifPagePathContains(STUDENTS),
   };
@@ -300,6 +366,44 @@ function hasClass(el = null, className = "") {
 
 function ifPagePathContains(pathPart = "") {
   return location.pathname.indexOf(pathPart) > -1;
+}
+
+function searchParamsFromObj(params = {}) {
+  return (
+    "?" +
+    Object.keys(params)
+      .map((key) => `${key}=${params[key]}`)
+      .join("&")
+  );
+}
+
+function searchParamsGet() {
+  const { search } = location;
+
+  if (!search || search[0] !== "?") {
+    return {};
+  }
+
+  return search
+    .slice(1)
+    .split("&")
+    .reduce((acc, curr) => {
+      const [label, value] = curr.split("=");
+
+      acc[label] = value;
+
+      return acc;
+    }, {});
+}
+
+function searchParamsSet(params = {}) {
+  const current = searchParamsGet();
+
+  Object.keys(params).forEach((key) => {
+    current[key] = params[key];
+  });
+
+  location.search = searchParamsFromObj(current);
 }
 
 function wandStringify({ core = "", length = 0, wood = "" } = {}) {
